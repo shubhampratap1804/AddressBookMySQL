@@ -1,0 +1,178 @@
+
+mysql> show databases;
++----------------------+
+| Database             |
++----------------------+
+| address_book_service |
+| employee_payroll     |
+| information_schema   |
+| mysql                |
+| payroll_service      |
+| performance_schema   |
+| sys                  |
++----------------------+
+7 rows in set (0.12 sec)
+
+mysql> use address_book_service;
+Database changed
+mysql> show tables;
++--------------------------------+
+| Tables_in_address_book_service |
++--------------------------------+
+| address_book_type              |
+| person_details                 |
++--------------------------------+
+2 rows in set (0.10 sec)
+
+mysql> describe person_details;
++-----------------+--------------+------+-----+---------+----------------+
+| Field           | Type         | Null | Key | Default | Extra          |
++-----------------+--------------+------+-----+---------+----------------+
+| firstname       | varchar(150) | NO   |     | NULL    |                |
+| lastname        | varchar(150) | NO   |     | NULL    |                |
+| address         | varchar(150) | NO   |     | NULL    |                |
+| city            | varchar(150) | NO   |     | NULL    |                |
+| state           | varchar(150) | NO   |     | NULL    |                |
+| zip             | int          | NO   |     | NULL    |                |
+| phoneNumber     | bigint       | NO   |     | NULL    |                |
+| addressbooktype | varchar(150) | YES  |     | NULL    |                |
+| addressbookname | varchar(150) | YES  |     | NULL    |                |
+| email           | varchar(150) | NO   |     | NULL    |                |
+| id              | int unsigned | NO   | PRI | NULL    | auto_increment |
++-----------------+--------------+------+-----+---------+----------------+
+11 rows in set (0.08 sec)
+
+mysql> describe address_book_type;
++-------+--------------+------+-----+---------+----------------+
+| Field | Type         | Null | Key | Default | Extra          |
++-------+--------------+------+-----+---------+----------------+
+| name  | varchar(50)  | NO   |     | NULL    |                |
+| id    | int unsigned | NO   | PRI | NULL    | auto_increment |
++-------+--------------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+mysql> create table person_contact
+    -> (
+    -> firstname                varchar(150) not null,
+    -> lastname                 varchar(150) not null,
+    -> address                  varchar(150) not null,
+    -> primary key              (firstname)
+    -> );
+Query OK, 0 rows affected (1.94 sec)
+
+mysql> create table address_book_alpha
+    -> (
+    -> zip            int(6) not null,
+    -> city           varchar(150) not null,
+    -> state          varchar(150) not null,
+    -> primary key    (zip)
+    -> );
+Query OK, 0 rows affected, 1 warning (1.30 sec)
+
+mysql> create table address_book_gamma
+    -> (
+    -> firstname          varchar(150) not null,
+    -> zip                int(6) not null,
+    -> foreign key(firstname) references person_contact(firstname),
+    -> foreign key(zip) references address_book_alpha(zip)
+    -> );
+Query OK, 0 rows affected, 1 warning (2.28 sec)
+
+mysql> show tables;
++--------------------------------+
+| Tables_in_address_book_service |
++--------------------------------+
+| address_book_alpha             |
+| address_book_gamma             |
+| address_book_type              |
+| person_contact                 |
+| person_details                 |
++--------------------------------+
+5 rows in set (0.07 sec)
+
+ ************************************ UC13 ********************************************
+
+mysql> show tables;
++--------------------------------+
+| Tables_in_address_book_service |
++--------------------------------+
+| address_book_alpha             |
+| address_book_gamma             |
+| address_book_type              |
+| person_contact                 |
+| person_details                 |
++--------------------------------+
+5 rows in set (0.00 sec)
+
+mysql> insert into address_book_alpha
+    -> (zip, city, state) values
+    -> (484555, 'Nowrozabad', 'MP'),
+    -> (560054, 'Bengaluru', 'Karnataka'),
+    -> (110110, 'RKPuram', 'Delhi');
+Query OK, 3 rows affected (0.27 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> select * from address_book_alpha;
++--------+------------+-----------+
+| zip    | city       | state     |
++--------+------------+-----------+
+| 110110 | RKPuram    | Delhi     |
+| 484555 | Nowrozabad | MP        |
+| 560054 | Bengaluru  | Karnataka |
++--------+------------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> update address_book_alpha set city = 'Umaria' where zip = 484555;
+Query OK, 1 row affected (0.12 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from address_book_alpha;
++--------+-----------+-----------+
+| zip    | city      | state     |
++--------+-----------+-----------+
+| 110110 | RKPuram   | Delhi     |
+| 484555 | Umaria    | MP        |
+| 560054 | Bengaluru | Karnataka |
++--------+-----------+-----------+
+3 rows in set (0.05 sec)
+
+mysql> delete from address_book_alpha where zip = 484555;
+Query OK, 1 row affected (0.14 sec)
+
+mysql> select * from address_book_alpha;
++--------+-----------+-----------+
+| zip    | city      | state     |
++--------+-----------+-----------+
+| 110110 | RKPuram   | Delhi     |
+| 560054 | Bengaluru | Karnataka |
++--------+-----------+-----------+
+2 rows in set (0.06 sec)
+
+mysql> select * from address_book_alpha where zip = 560054;
++--------+-----------+-----------+
+| zip    | city      | state     |
++--------+-----------+-----------+
+| 560054 | Bengaluru | Karnataka |
++--------+-----------+-----------+
+1 row in set (0.00 sec)
+
+mysql> select zip, count(city) from address_book_alpha group by state;
++--------+-------------+
+| zip    | count(city) |
++--------+-------------+
+| 110110 |           1 |
+| 560054 |           1 |
++--------+-------------+
+2 rows in set (0.00 sec)
+
+mysql> select * from address_book_alpha order by city;
++--------+-----------+-----------+
+| zip    | city      | state     |
++--------+-----------+-----------+
+| 560054 | Bengaluru | Karnataka |
+| 110110 | RKPuram   | Delhi     |
++--------+-----------+-----------+
+2 rows in set (0.03 sec)
+
+mysql>
+
